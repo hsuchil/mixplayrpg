@@ -1,0 +1,19 @@
+{
+    "name": "mixplayrpg_gameclient",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "start": "node index.js",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "author": "hsuchil",
+    "license": "MIT",
+    "dependencies": {
+        "beam-interactive-node2": "^2.9.0",
+        "fs": "0.0.1-security",
+        "mixer-shortcode-oauth": "^1.0.3",
+        "node": "^10.6.0",
+        "ws": "^5.2.2"
+    }
+}

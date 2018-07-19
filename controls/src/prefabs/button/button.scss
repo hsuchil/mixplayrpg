@@ -1,0 +1,356 @@
+@import '../../variables';
+
+// Button styling variables
+$button-margin: 4px;
+$button-bolt-color: $base-color-accent !default;
+$button-background-color: $base-color-default !default;
+$button-border-color: $base-color-border !default;
+$button-active-border-color: $base-color-primary !default;
+$button-progress-height: 5px !default;
+$button-border-radius: 3px !default;
+$button-progress-foreground: $base-color-accent !default;
+$button-progress-background: #232b47 !default;
+// todo(connor4312): ripples
+$button-text-color: #f3f5fd !default;
+$button-cost-default-color: #a2a5b0 !default;
+$button-cost-unaffordable-color: #fe5353 !default;
+$button-cost-background-color: $base-color-default !default;
+$button-cost-border-color: $base-color-border !default;
+$button-cost-bolt-color: $base-color-accent !default;
+$button-cost-bolt-size: 13px !default;
+$button-tooltip-background: #2e354b !default;
+$button-tooltip-arrow-size: 8px;
+$button-font-size: 14px !default;
+$button-font-weight: 500 !default;
+$button-font-shadow: 0 1px 2px rgba(#000, 0.2) !default;
+$button-cooldown-spinner-size: 12px !default;
+$Button-cooldown-height: 22px !default;
+$button-hover-gradient: linear-gradient(to right, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.1));
+$button-active-gradient: linear-gradient(to left, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.1));
+$button-focus-gradient: linear-gradient(to right, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.15));
+
+$button-z-base: 0 !default;
+$button-z-progress: $button-z-base + 1;
+$button-z-cooldown: $button-z-base + 1;
+$button-z-cost: $button-z-cooldown + 1;
+$button-z-tooltip: $button-z-cost + 1;
+
+// Mixin (used by the spark pill and the button itself) to define base
+// background and border colors/styles.
+@mixin button-like() {
+  border-radius: $button-border-radius;
+  background: $button-background-color;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  transition: border-color $easing-default-duration $easing-default-curve;
+}
+
+@mixin default-hover() {
+  z-index: $button-z-base + 1;
+
+  .state {
+    @include absolute-cover();
+    z-index: $button-z-base - 1;
+    border-radius: $button-border-radius;
+    background: $button-hover-gradient;
+  }
+
+  .mixer-spark-pill:not(.unaffordable) {
+    color: $base-color-accent;
+  }
+}
+
+@mixin default-active() {
+  .state {
+    background: $button-active-gradient;
+    transition: 0s;
+  }
+}
+
+@mixin default-focus() {
+  z-index: $button-z-base + 1;
+
+  .state {
+    @include absolute-cover();
+    border-radius: $button-border-radius;
+    background: $button-focus-gradient;
+  }
+}
+
+@keyframes loader-spin {
+  0%   { transform: translate(-50%, -50%) rotate(0deg) }
+  100% { transform: translate(-50%, -50%) rotate(360deg) }
+}
+
+// Styling for the default button control.
+.mixer-button {
+  @include layout-center-contents();
+  @include button-like();
+
+  position: absolute;
+  top: $button-margin;
+  left: $button-margin;
+  right: $button-margin;
+  bottom: $button-margin;
+  cursor: pointer;
+  font-weight: $button-font-weight;
+  text-shadow: $button-font-shadow;
+  outline: 0 !important;
+  z-index: $button-z-base;
+  transition: border-color 1s, background-color 0.5s;
+  user-select: none;
+  background-size: 100% 100%;
+
+  &:hover {
+    @include default-hover();
+  }
+
+  &:focus {
+    @include default-focus();
+  }
+
+  &:active,
+  &.active {
+    @include default-active();
+  }
+
+
+  // The disabled class is applied when the input gets disabled.
+  &[disabled] {
+    opacity: 0.7;
+    cursor: default;
+
+    &:hover {
+      border-color: $base-color-border;
+    }
+  }
+
+  // A content element is nested in the button and contains the text
+  // to display in the control.
+  &-content {
+    overflow: hidden;
+    text-align: center;
+    color: $button-text-color;
+    font-size: $button-font-size;
+    padding: 0 5px;
+    // max-height: 100%; // This was commented out in order to support current styling on prod.
+    // This will be changed after we have a label prefab for people to use.
+    text-overflow: ellipsis;
+
+    &.cooldown {
+      margin-top: 18px;
+      transition: margin-top $easing-default-duration;
+    }
+  }
+
+  &.compact {
+    .mixer-button-content.cooldown {
+      opacity: 0;
+    }
+
+    .mixer-cooldown {
+      bottom: 0;
+      height: unset;
+    }
+  }
+
+  &.hidden {
+    opacity: 0;
+  }
+}
+
+.tippy-tooltip {
+  background: $button-tooltip-background;
+  font-weight: normal;
+  color: #fff;
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.7), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+$positions: top bottom;
+@each $pos in $positions {
+  .tippy-popper[x-placement^=#{$pos}] .tippy-arrow {
+    border-#{$pos}: 7px solid $button-tooltip-background;
+  }
+}
+
+// Styling for the cooldown that overlays custom controls.
+.mixer-cooldown {
+  @include layout-center-contents();
+  @include absolute-cover();
+
+  bottom: auto;
+  min-height: $button-cooldown-spinner-size;
+  height: $Button-cooldown-height;
+  border-radius: $button-border-radius;
+  background: $button-hover-gradient;
+  opacity: 0;
+  transition: opacity $easing-default-duration $easing-default-curve;
+  pointer-events: none;
+  z-index: $button-z-cooldown;
+  user-select: none;
+
+  > div {
+    text-align: center;
+    min-height: $button-cooldown-spinner-size;
+    height: $Button-cooldown-height;
+    padding-left: $button-cooldown-spinner-size + $base-border-width * 2 + 6px;
+    position: relative;
+    color: #fff;
+
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      left: $button-cooldown-spinner-size / 2;
+      top: 50%;
+      width: $button-cooldown-spinner-size;
+      height: $button-cooldown-spinner-size;
+      border-radius: 50%;
+      border: $base-border-width solid transparent;
+      transform: translate(-50%, -50%);
+    }
+
+    &::before {
+      border-left-color: $base-color-primary;
+      z-index: 0;
+      animation: 3s loader-spin infinite linear;
+    }
+
+    &::after {
+      border-color: rgba(#fff, 0.2);
+      z-index: 1;
+    }
+
+    &.hidden {
+      padding-left: $button-cooldown-spinner-size;
+      pointer-events: none;
+
+      .time {
+        width: 0;
+        opacity: 0;
+      }
+    }
+  }
+
+  &:hover > div.hidden {
+    padding-left: 0;
+
+    &::before,
+    &::after {
+      display: none;
+      transition: display .25s ease-in-out;
+    }
+
+    .time {
+      width: auto;
+      opacity: 1;
+      transition: opacity .25s ease-in-out;
+    }
+  }
+
+  &.c-active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  &.progress {
+    margin-top: 5px;
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+  }
+}
+
+// Styling for the button's cost that pops up.
+.mixer-spark-pill {
+  @include layout-center-contents();
+  font-weight: $button-font-weight;
+  color: $button-cost-default-color;
+  font-size: 0.9em;
+  z-index: $button-z-cost;
+  line-height: 1.1;
+
+  &:before {
+    content: '';
+    margin-bottom: -2px;
+    width: $button-cost-bolt-size;
+    height: $button-cost-bolt-size;
+    background: url('./static/spark.svg') center center no-repeat;
+    background-size: contain;
+    display: inline-block;
+  }
+
+  &.unaffordable {
+    color: $button-cost-unaffordable-color;
+  }
+}
+
+// Styling for the progress bar that appares under the button when
+// the buttons progress is > 0
+.mixer-progress-bar {
+  @include absolute-cover();
+  height: $button-progress-height;
+  overflow: hidden;
+  bottom: auto;
+  z-index: $button-z-progress;
+  border-top-left-radius: $button-border-radius - 1;
+  border-top-right-radius: $button-border-radius - 1;
+
+  &::before,
+  > div {
+    @include absolute-cover();
+  }
+
+  &::before {
+    content: '';
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(100%);
+    transition: transform $easing-default-duration;
+  }
+
+  &.enabled::before {
+    transform: translateY(0%);
+  }
+
+  > div {
+    background: $button-progress-foreground;
+    transition: transform $easing-default-duration;
+  }
+}
+
+.platform {
+  &-xbox {
+    .mixer-button {
+      border: 2px solid $button-background-color;
+
+      &:focus {
+        @include default-hover();
+        border: 2px solid $button-active-border-color;
+      }
+
+      &:active {
+        @include default-active();
+      }
+    }
+  }
+
+  &-mobile {
+    @media screen and (max-width: 320px) {
+      .mixer-button.compact {
+        .mixer-button-content {
+          line-height: 1;
+          font-size: 0.75em;
+        }
+
+        .mixer-progress-bar {
+          height: 3px;
+        }
+
+        .mixer-cooldown.progress {
+          margin-top: 3px;
+        }
+      }
+    }
+  }
+}
