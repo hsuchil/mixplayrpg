@@ -7,6 +7,15 @@ const utilities = require('./utilities.js');
 
 const authFile = "mixer_auth.json";
 
+const scenesArray = [
+    {
+        sceneID: 'default',
+        controls: [],
+        containers: []
+    }
+];
+
+
 function main() {
     fs.readFile(
         authFile,
@@ -53,12 +62,28 @@ function main() {
 
                     mixerInteractive.setWebSocket(ws);
                     client = new mixerInteractive.GameClient();
+
+                    client.on('open', gc.onInteractiveOpen);
+                    client.on('error', gc.onInteractiveError);
+
                     client.open({
                         authToken: token.access_token,
                         versionId: authToken.versionID
-                    });
+                    }).then(() => {
+                        client.on('error', gc.onInteractiveError); // Gotta do this twice?
+                        client.on('message', gc.onInteractiveMessage);
+                        client.getScenes().then(() => {
+                            client.updateScenes({
+                                scenes: scenesArray
+                            })
+                        }).then(() => {
+                            client.ready()
+                                .then(gc.onInteractiveReady)
+                                .catch(gc.onInteractiveError);
 
-                    client.on('open', gc.onInteractiveOpen);
+                        }).catch(gc.onInteractiveError);
+                    }).catch(gc.onInteractiveError);
+
                     client.state.on('participantJoin', gc.onParticipantJoin);
                     client.state.on('participantLeave', gc.onParticipantLeave);
                 });
