@@ -1,12 +1,15 @@
 const utilities = require('./utilities');
 
+mixer = null;
+
 msBetweenFrames = 15;
 msDataFlush = 60000;
 
 registeredPlayers = {};
 onlinePlayers = {};
 
-//#region Mixer Stuff...
+//#region Mixer Stuff
+
 exports.onInteractiveOpen = function onInteractiveOpen() {
     // Do something?
     utilities.log('Interactive Open.');
@@ -40,10 +43,10 @@ exports.onInteractiveMessage = function onInteractiveMessage(message) {
                 break;
 
             case 'giveInput':
-                participantID = msg.params.participantID;
+                sid = msg.params.participantID;
                 type = msg.params.input.type;
                 data = msg.params.input.data;
-                handleEvent(participantID, type, data);
+                handleEvent(sid, type, data);
                 break;
 
             default:
@@ -55,6 +58,11 @@ exports.onInteractiveMessage = function onInteractiveMessage(message) {
 exports.onInteractiveError = function onInteractiveError(error) {
     utilities.logFatal('InteractiveError: ' + error);
 }
+
+exports.setMixerClient = function setMixerClient(client) {
+    mixer = client;
+}
+
 //#endregion
 
 function StartGame() {
@@ -67,6 +75,8 @@ function GameLoop() {
     setTimeout(GameLoop, msBetweenFrames);
 }
 
+//#region Persistence
+
 function LoadData() {
     setTimeout(FlushData, msBetweenFrames);
 }
@@ -75,41 +85,80 @@ function FlushData() {
     setTimeout(FlushData, msBetweenFrames);
 }
 
+//#endregion
 
 function playerFromParticipant(participant) {
     player = {};
     if (participant.userID !== '0' && participant.userID in registeredPlayers) {
         player = registeredPlayers[participant.userID];
     } else {
-        player.userID = participant.userID;
+        player.uid = participant.userID;
         player.username = participant.username;
         player.level = 1;
         player.experience = 0;
     }
 
-    player.sessionID = participant.sessionID;
+    player.sid = participant.sessionID;
     player.isMod = utilities.arrayContains(participant.channelGroups, 'Mod');
     player.isPro = utilities.arrayContains(participant.channelGroups, 'Pro');
     player.isOwner = utilities.arrayContains(participant.channelGroups, 'Owner');
 
-    if (player.userID !== '0') {
-        registeredPlayers[player.userID] = player;
+    if (player.uid !== '0') {
+        registeredPlayers[player.uid] = player;
     }
 
     return player;
 }
 
+//#region Inbound Messages
+
 function handlePlayerJoined(player) {
-    onlinePlayers[player.sessionID] = player;
+    onlinePlayers[player.sid] = player;
     console.log(`Player ${player.username} joined!`);
 }
 
 function handlePlayerLeft(player) {
-    delete onlinePlayers[player.sessionID];
+    delete onlinePlayers[player.sid];
     console.log(`Player ${player.username} left... :(`);
 }
 
-function handleEvent(participantID, type, data) {
-    datastr = data.toString();
-    console.log(`Event ${type} by ${participantID}.\nData: ${datastr}`);
+function handleEvent(sid, type, data) {
+    if (!(sid in onlinePlayers)) {
+        utilities.log('Event sent by offline player.');
+        return;
+    }
+
+    player = onlinePlayers[sid];
+    datastr = JSON.stringify(data);
+    console.log(`Event ${type} by ${player.username}. Data: ${datastr}`);
+    sendDataToPlayer(sid, { message: 'Cool story bro!' });
+    sendDataToAll({ message: 'Hello World!' });
 }
+
+//#endregion
+
+//#region Outbound Messages
+
+function sendDataToPlayer(sid, data) {
+    mixer.execute(
+        'broadcastEvent',
+        {
+            scope: ['participant:' + sid],
+            data: data
+        },
+        false
+    );
+}
+
+function sendDataToAll(data) {
+    mixer.execute(
+        'broadcastEvent',
+        {
+            scope: ['group:default'],
+            data: data
+        },
+        false
+    );
+}
+
+//#endregion

@@ -62,6 +62,7 @@ function main() {
                     mixerInteractive.setWebSocket(ws);
                     client = new mixerInteractive.GameClient();
 
+                    gc.setMixerClient(client);
                     client.on('open', gc.onInteractiveOpen);
                     client.on('error', gc.onInteractiveError);
 

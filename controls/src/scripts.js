@@ -34,6 +34,16 @@ function handleVideoResized(position) {
     overlay.style.width = `${player.width}px`;
 }
 
+sendMessageToGameClient(
+    'something',
+    {
+        some: 'thing',
+        this: 'is nonsense...'
+    }
+);
+
+//#region Game Client Communications
+
 function sendMessageToGameClient(type, data) {
     mixer.socket.call('giveInput', {
         controlID: 'my-control',
@@ -43,10 +53,11 @@ function sendMessageToGameClient(type, data) {
     });
 }
 
-sendMessageToGameClient(
-    'something',
-    {
-        some: 'thing',
-        this: 'is nonsense...'
-    }
-);
+function processGameClientMessage(msg) {
+    JSON.stringify(msg);
+    console.log(msg);
+}
+
+//#endregion
+
+mixer.socket.on('event', processGameClientMessage);
