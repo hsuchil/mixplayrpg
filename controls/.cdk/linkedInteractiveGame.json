@@ -1,0 +1,26 @@
+{
+  "coverUrl": null,
+  "createdAt": "2018-07-19T02:19:52.000Z",
+  "deletedAt": null,
+  "description": null,
+  "hasPublishedVersions": false,
+  "id": 262611,
+  "installation": null,
+  "isShared": false,
+  "name": "MixPlay RPG",
+  "ownerId": 9157633,
+  "typeId": 130909,
+  "updatedAt": "2018-07-19T02:19:52.000Z",
+  "versions": [
+    {
+      "changelog": "Initial release",
+      "createdAt": "2018-07-19T02:19:52.000Z",
+      "id": 267738,
+      "installation": null,
+      "state": "draft",
+      "updatedAt": "2018-07-19T02:20:23.000Z",
+      "version": "0.1.0",
+      "versionOrder": 256
+    }
+  ]
+}
