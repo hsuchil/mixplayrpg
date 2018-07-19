@@ -13,11 +13,13 @@ window.addEventListener('load', function initMixer() {
     // Whenever someone clicks on "Hello World", we'll send an event
     // to the game client on the control ID "hello-world"
     document.getElementById('hello-world').onclick = function (event) {
-        mixer.socket.call('giveInput', {
-            controlID: 'my_first_button',
-            event: 'click',
-            button: event.button,
-        });
+        sendMessageToGameClient(
+            'something',
+            {
+                some: 'thing',
+                this: 'is nonsense...'
+            }
+        );
     };
 
     mixer.isLoaded();
@@ -31,3 +33,20 @@ function handleVideoResized(position) {
     overlay.style.height = `${player.height}px`;
     overlay.style.width = `${player.width}px`;
 }
+
+function sendMessageToGameClient(type, data) {
+    mixer.socket.call('giveInput', {
+        controlID: 'my-control',
+        event: 'click',
+        type: type,
+        data: data
+    });
+}
+
+sendMessageToGameClient(
+    'something',
+    {
+        some: 'thing',
+        this: 'is nonsense...'
+    }
+);

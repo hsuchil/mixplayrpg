@@ -6,9 +6,7 @@
         {
           "controls": [
             {
-              "controlID": "my_first_button",
-              "cost": 0,
-              "disabled": false,
+              "controlID": "my-control",
               "kind": "button",
               "position": [
                 {
@@ -17,16 +15,8 @@
                   "width": 10,
                   "x": 0,
                   "y": 0
-                },
-                {
-                  "height": 8,
-                  "size": "medium",
-                  "width": 10,
-                  "x": 0,
-                  "y": 0
                 }
               ],
-              "progress": 0.5,
               "text": "My First Button"
             }
           ],
@@ -34,6 +24,6 @@
         }
       ]
     },
-    "savedAt": 1531974536336
+    "savedAt": 1531975459653
   }
 ]

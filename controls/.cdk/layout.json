@@ -17,7 +17,7 @@
         "reorderEnabled": true,
         "title": "",
         "type": "stack",
-        "width": 17.41901221455125
+        "width": 25.580011897679956
       },
       {
         "content": [
@@ -63,7 +63,7 @@
         "reorderEnabled": true,
         "title": "",
         "type": "column",
-        "width": 82.58098778544876
+        "width": 74.41998810232005
       }
     ],
     "isClosable": true,
