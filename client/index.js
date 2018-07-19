@@ -31,7 +31,6 @@ function main() {
 
             try {
                 authToken = JSON.parse(contents);
-                utilities.log(authToken);
                 if (typeof authToken.oauthClient !== 'string') {
                     utilities.logFatal('OAuth Client is not defined in mixer_auth.json');
                 }
@@ -83,9 +82,6 @@ function main() {
 
                         }).catch(gc.onInteractiveError);
                     }).catch(gc.onInteractiveError);
-
-                    client.state.on('participantJoin', gc.onParticipantJoin);
-                    client.state.on('participantLeave', gc.onParticipantLeave);
                 });
 
                 auth.on('expired', () => {
