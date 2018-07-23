@@ -143,14 +143,8 @@ function handlePlayerLeft(player) {
     console.log(`Player ${player.username} left... :(`);
 }
 
-var eventHandlers = { dummy: handleDummy };
+var eventHandlers = {};
 
-function handleDummy(player, data) {
-    datastr = JSON.stringify(data);
-    playerstr = JSON.stringify(player);
-    console.log(`Dummy messaage received from ${playerstr} saying ${datastr}`);
-    sendDataToPlayer(player.sid, 'foobar', { bar: 'none' });
-}
 //#endregion
 
 //#region Outbound Messages
