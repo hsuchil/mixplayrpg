@@ -5,7 +5,7 @@ const fs = require('fs');
 const gc = require('./gameClient.js');
 const utilities = require('./utilities.js');
 
-const authFile = "mixer_auth.json";
+const authFile = 'mixer_auth.json';
 
 const scenesArray = [
     {
@@ -14,7 +14,6 @@ const scenesArray = [
         containers: []
     }
 ];
-
 
 function main() {
     fs.readFile(
@@ -32,11 +31,15 @@ function main() {
             try {
                 authToken = JSON.parse(contents);
                 if (typeof authToken.oauthClient !== 'string') {
-                    utilities.logFatal('OAuth Client is not defined in mixer_auth.json');
+                    utilities.logFatal(
+                        'OAuth Client is not defined in mixer_auth.json'
+                    );
                 }
 
                 if (typeof authToken.versionID !== 'number') {
-                    utilities.logFatal('versionID is not defined in mixer_auth.json');
+                    utilities.logFatal(
+                        'versionID is not defined in mixer_auth.json'
+                    );
                 }
 
                 const authInfo = {
@@ -50,13 +53,18 @@ function main() {
                     ]
                 };
 
-                const store = new mixerOauth.LocalTokenStore(__dirname + '/mixertoken.json');
-                const auth = new mixerOauth.ShortcodeAuthClient(authInfo, store);
+                const store = new mixerOauth.LocalTokenStore(
+                    __dirname + '/mixertoken.json'
+                );
+                const auth = new mixerOauth.ShortcodeAuthClient(
+                    authInfo,
+                    store
+                );
                 auth.on('code', code => {
                     utilities.log(`Go to https://mixer.com/go?code=${code} `);
                 });
 
-                auth.on('authorized', (token) => {
+                auth.on('authorized', token => {
                     utilities.log('Got token!');
 
                     mixerInteractive.setWebSocket(ws);
@@ -66,23 +74,30 @@ function main() {
                     client.on('open', gc.onInteractiveOpen);
                     client.on('error', gc.onInteractiveError);
 
-                    client.open({
-                        authToken: token.access_token,
-                        versionId: authToken.versionID
-                    }).then(() => {
-                        client.on('error', gc.onInteractiveError); // Gotta do this twice?
-                        client.on('message', gc.onInteractiveMessage);
-                        client.getScenes().then(() => {
-                            client.updateScenes({
-                                scenes: scenesArray
-                            })
-                        }).then(() => {
-                            client.ready()
-                                .then(gc.onInteractiveReady)
+                    client
+                        .open({
+                            authToken: token.access_token,
+                            versionId: authToken.versionID
+                        })
+                        .then(() => {
+                            client.on('error', gc.onInteractiveError); // Gotta do this twice?
+                            client.on('message', gc.onInteractiveMessage);
+                            client
+                                .getScenes()
+                                .then(() => {
+                                    client.updateScenes({
+                                        scenes: scenesArray
+                                    });
+                                })
+                                .then(() => {
+                                    client
+                                        .ready()
+                                        .then(gc.onInteractiveReady)
+                                        .catch(gc.onInteractiveError);
+                                })
                                 .catch(gc.onInteractiveError);
-
-                        }).catch(gc.onInteractiveError);
-                    }).catch(gc.onInteractiveError);
+                        })
+                        .catch(gc.onInteractiveError);
                 });
 
                 auth.on('expired', () => {
@@ -93,7 +108,7 @@ function main() {
                     utilities.logFatal('Auth request declined');
                 });
 
-                auth.on('error', (e) => {
+                auth.on('error', e => {
                     utilities.logFatal('Auth error: ' + e);
                 });
 
@@ -107,4 +122,3 @@ function main() {
 }
 
 main();
-

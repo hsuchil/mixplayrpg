@@ -5,70 +5,44 @@
         "activeItemIndex": 0,
         "content": [
           {
-            "componentName": "ControlSchema",
+            "componentName": "Controls",
             "isClosable": true,
             "reorderEnabled": true,
-            "title": "Control Schema",
-            "type": "component"
+            "title": "Controls",
+            "type": "component",
+            "width": 0.75
           }
         ],
-        "header": {},
+        "height": 63.368421052631575,
         "isClosable": true,
         "reorderEnabled": true,
         "title": "",
         "type": "stack",
-        "width": 25.580011897679956
+        "width": 82.58098778544876
       },
       {
+        "activeItemIndex": 0,
         "content": [
           {
-            "activeItemIndex": 0,
-            "content": [
-              {
-                "componentName": "Controls",
-                "isClosable": true,
-                "reorderEnabled": true,
-                "title": "Controls",
-                "type": "component",
-                "width": 0.75
-              }
-            ],
-            "height": 63.368421052631575,
+            "componentName": "ControlsConsole",
             "isClosable": true,
             "reorderEnabled": true,
-            "title": "",
-            "type": "stack",
-            "width": 82.58098778544876
-          },
-          {
-            "activeItemIndex": 0,
-            "content": [
-              {
-                "componentName": "ControlsConsole",
-                "isClosable": true,
-                "reorderEnabled": true,
-                "title": "Control Output Console",
-                "type": "component"
-              }
-            ],
-            "header": {},
-            "height": 36.631578947368425,
-            "isClosable": true,
-            "reorderEnabled": true,
-            "title": "",
-            "type": "stack"
+            "title": "Control Output Console",
+            "type": "component"
           }
         ],
+        "header": {},
+        "height": 36.631578947368425,
         "isClosable": true,
         "reorderEnabled": true,
         "title": "",
-        "type": "column",
-        "width": 74.41998810232005
+        "type": "stack"
       }
     ],
     "isClosable": true,
     "reorderEnabled": true,
     "title": "",
-    "type": "row"
+    "type": "column",
+    "width": 100
   }
 ]

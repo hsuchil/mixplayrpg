@@ -1,29 +1,32 @@
-window.addEventListener('load', function initMixer() {
+$(document).ready(function start() {
+    mixer.socket.on('event', processGameClientMessage);
     mixer.display.position().subscribe(handleVideoResized);
+    moveVideo(0);
+});
 
-    // Move the video by a static offset amount
-    const offset = 0;
+$('#hello').click(function() {
+    console.log('Sending data to server');
+    sendMessageToGameClient('dummy', { foo: 'bar', myint: 123 });
+});
+
+var eventHandlers = {
+    initialMessage: handleInitialMessage,
+    foobar: handleFoobar
+};
+
+function handleFoobar(data) {
+    dataStr = JSON.stringify(data);
+    console.log(`Received ${datastr} from player`);
+}
+
+function moveVideo(offset) {
     mixer.display.moveVideo({
         top: offset,
         bottom: offset,
         left: offset,
-        right: offset,
+        right: offset
     });
-
-    // Whenever someone clicks on "Hello World", we'll send an event
-    // to the game client on the control ID "hello-world"
-    document.getElementById('hello-world').onclick = function (event) {
-        sendMessageToGameClient(
-            'something',
-            {
-                some: 'thing',
-                this: 'is nonsense...'
-            }
-        );
-    };
-
-    mixer.isLoaded();
-});
+}
 
 function handleVideoResized(position) {
     const overlay = document.getElementById('overlay');
@@ -34,13 +37,9 @@ function handleVideoResized(position) {
     overlay.style.width = `${player.width}px`;
 }
 
-sendMessageToGameClient(
-    'something',
-    {
-        some: 'thing',
-        this: 'is nonsense...'
-    }
-);
+function handleInitialMessage(data) {
+    console.log(data.player.username);
+}
 
 //#region Game Client Communications
 
@@ -53,11 +52,21 @@ function sendMessageToGameClient(type, data) {
     });
 }
 
-function processGameClientMessage(msg) {
-    JSON.stringify(msg);
+var processGameClientMessage = function(msg) {
     console.log(msg);
-}
+    console.log(JSON.stringify(msg));
+    if (
+        typeof msg.event != 'undefined' &&
+        typeof msg.event.type != 'undefined'
+    ) {
+        if (typeof eventHandlers[msg.event.type] != 'undefined') {
+            eventHandlers[msg.event.type](msg.event.data);
+        } else {
+            console.error('Unrecognized event: ' + msg.event.type);
+        }
+    }
+};
 
 //#endregion
 
-mixer.socket.on('event', processGameClientMessage);
+mixer.isLoaded();

@@ -1,0 +1,5 @@
+#overlay {
+    background: grey;
+    position: absolute;
+    visibility: hidden;
+}
